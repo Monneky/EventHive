@@ -173,3 +173,61 @@ create policy "Owner elimina miembros" on organization_members for delete
         and om.role = 'owner'
     )
   );
+
+-- ============================================================
+-- Clientes por organización
+-- ============================================================
+
+create table clients (
+  id uuid default gen_random_uuid() primary key,
+  organization_id uuid references organizations(id) on delete cascade not null,
+  name text not null,
+  email text,
+  phone text,
+  address text,
+  notes text,
+  created_at timestamp with time zone default timezone('utc', now()) not null
+);
+
+alter table clients enable row level security;
+
+-- Miembros de la org pueden ver sus clientes
+create policy "Miembros ven clientes de su org" on clients for select
+  using (
+    exists (
+      select 1 from organization_members
+      where organization_id = clients.organization_id
+        and profile_id = auth.uid()
+    )
+  );
+
+-- Miembros de la org pueden crear clientes
+create policy "Miembros crean clientes" on clients for insert
+  with check (
+    exists (
+      select 1 from organization_members
+      where organization_id = clients.organization_id
+        and profile_id = auth.uid()
+    )
+  );
+
+-- Miembros de la org pueden editar clientes
+create policy "Miembros editan clientes" on clients for update
+  using (
+    exists (
+      select 1 from organization_members
+      where organization_id = clients.organization_id
+        and profile_id = auth.uid()
+    )
+  );
+
+-- Solo owners pueden eliminar clientes
+create policy "Owner elimina clientes" on clients for delete
+  using (
+    exists (
+      select 1 from organization_members
+      where organization_id = clients.organization_id
+        and profile_id = auth.uid()
+        and role = 'owner'
+    )
+  );

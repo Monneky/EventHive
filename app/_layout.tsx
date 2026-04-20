@@ -13,7 +13,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (loading) return;
-    if (session) router.replace('/(app)/(tabs)');
+    if (session) router.replace('/(app)/(drawer)');
     else router.replace('/(auth)/login');
   }, [session, loading]);
 

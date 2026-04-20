@@ -39,3 +39,14 @@ export type OrganizationMember = {
   organizations?: Organization;
   profiles?: Profile;
 };
+
+export type Client = {
+  id: string;
+  organization_id: string;
+  name: string;
+  email: string | null;
+  phone: string | null;
+  address: string | null;
+  notes: string | null;
+  created_at: string;
+};
